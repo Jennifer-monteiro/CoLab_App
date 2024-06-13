@@ -5,29 +5,28 @@ import SecondNavbar from "../components/SecondNavbar";
 import Footer from "../components/Footer";
 import ItineraryHeader from "../components/ItineraryHeader";
 import AddToItineraryModal from '../components/AddToItineraryModal';
+import PlaceDetailsModal from '../components/PlaceDetailsModal';
 import "../styles/ItineraryPage.css";
 
-
-// Create an axios instance for API calls
 const axiosInstance = axios.create({
     baseURL: process.env.NODE_ENV === 'production' ? 'https://colab-app.onrender.com' : 'http://localhost:5000',
     withCredentials: true,
 });
 
 const ItineraryPage = () => {
-    const [searchTerm, setSearchTerm] = useState('');  // State to hold the search term
-    const [selectedPlace, setSelectedPlace] = useState(null);  // State to hold the selected place
-    const [places, setPlaces] = useState([]);  // State to hold the list of places
-    const [loading, setLoading] = useState(false);  // State to handle loading status
-    const [showModal, setShowModal] = useState(false);  // State to handle modal visibility
-    const [isLoggedIn, setIsLoggedIn] = useState(false);  // State to handle login status
-    const [selectedFilters, setSelectedFilters] = useState([]);  // State to handle selected filters
-    const [checkboxState, setCheckboxState] = useState({}); // State to track checkbox state
-    const [visiblePlacesCount, setVisiblePlacesCount] = useState(6);  // State to track number of visible places
+    const [searchTerm, setSearchTerm] = useState('');
+    const [selectedPlace, setSelectedPlace] = useState(null);
+    const [places, setPlaces] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [showAddModal, setShowAddModal] = useState(false);
+    const [showDetailsModal, setShowDetailsModal] = useState(false);
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [selectedFilters, setSelectedFilters] = useState([]);
+    const [checkboxState, setCheckboxState] = useState({});
+    const [visiblePlacesCount, setVisiblePlacesCount] = useState(6);
     const [selectedPlaceDetails, setSelectedPlaceDetails] = useState(null);
     const navigate = useNavigate();
 
-    // Check if the user is logged in when the component mounts
     useEffect(() => {
         const checkLoginStatus = async () => {
             try {
@@ -46,16 +45,14 @@ const ItineraryPage = () => {
         checkLoginStatus();
     }, [navigate]);
 
-    // Fetch places based on the search term and selected filters
     useEffect(() => {
         const fetchPlaces = async () => {
-            setLoading(true);  // Set loading to true while fetching data
+            setLoading(true);
             try {
-                const response = await axiosInstance.post('/itinerary_search', {
+                const response = await axiosInstance.post('/itinerary_search', { 
                     city: searchTerm,
                     categories: selectedFilters,
                 });
-                console.log('Filtered Response:', response.data);
                 if (response.data && response.data.places) {
                     setPlaces(response.data.places);
                 } else {
@@ -64,47 +61,57 @@ const ItineraryPage = () => {
             } catch (error) {
                 console.error('Error fetching filtered places:', error);
             }
-            setLoading(false);  // Set loading to false after fetching data
+            setLoading(false);
         };
 
         if (searchTerm && searchTerm.trim() !== '') {
             fetchPlaces();
         }
-    }, [searchTerm, selectedFilters]);  // Effect depends on searchTerm and selectedFilters
+    }, [searchTerm, selectedFilters]);
 
-    // Handle changes in the search input
     const handleSearchChange = (e) => {
         setSearchTerm(e.target.value);
     };
 
-    // Handle changes in the filter checkboxes
     const handleCheckboxChange = (filter) => {
-        setSelectedFilters((prevFilters) => 
+        setSelectedFilters((prevFilters) =>
             prevFilters.includes(filter) ? prevFilters.filter(item => item !== filter) : [...prevFilters, filter]
         );
 
-        // Update checkbox state
         setCheckboxState((prevState) => ({
             ...prevState,
-            [filter]: !prevState[filter], // Toggle the checkbox state
+            [filter]: !prevState[filter],
         }));
     };
 
     const handleRemoveFilter = (filter) => {
         setSelectedFilters((prevFilters) => prevFilters.filter(item => item !== filter));
 
-        // Update checkbox state
         setCheckboxState((prevState) => ({
             ...prevState,
-            [filter]: false, // Uncheck the checkbox
+            [filter]: false,
         }));
     };
-
+    const handlePlaceImageClick = (place) => {
+        console.log('Clicked place:', place); // Check if place is defined and contains necessary properties
+        
+        // Store selected place information in localStorage
+        localStorage.setItem('selectedPlaceName', place.name);
+        localStorage.setItem('selectedPlacePhoto', place.photo_url);
+        localStorage.setItem('selectedPlaceAddress', place.address);
+    
+        setSelectedPlaceDetails(place);  // Set the place directly
+        setShowDetailsModal(true);  // Open the modal
+    };
+    
+    
     const handleAddToItinerary = (place) => {
+        console.log('Clicked place:', place); // Check if place is defined and contains necessary properties
         setSelectedPlace(place);
-        setShowModal(true);
-        console.log('Selected place name:', place.name);
+        setShowAddModal(true);
 
+        // Store selected place information in localStorage
+        localStorage.setItem('selectedPlaceId', place.id);
         localStorage.setItem('selectedPlaceName', place.name);
         localStorage.setItem('selectedPlacePhoto', place.photo_url);
     };
@@ -113,7 +120,7 @@ const ItineraryPage = () => {
         setVisiblePlacesCount((prevCount) => prevCount + 3);
     };
 
-   
+    
 
     return (
         <div>
@@ -316,9 +323,9 @@ const ItineraryPage = () => {
                                     <div className="place-item">
                                         <button className="add-button" onClick={() => handleAddToItinerary(place)}>Add to Itinerary</button>
                                         {place.photo_url ? (
-                                            <img src={place.photo_url} alt={place.name} onClick={() => handlePlaceImageClick(place.id)} />
+                                            <img src={place.photo_url} alt={place.name} onClick={() => handlePlaceImageClick(place)} />
                                         ) : (
-                                            <div onClick={() => handlePlaceImageClick(place.id)}>No Image Available</div>
+                                            <div onClick={() => handlePlaceImageClick(place)}>No Image Available</div>
                                         )}
                                     </div>
                                     <h3 className="place-name">{place.name}</h3>
@@ -336,16 +343,22 @@ const ItineraryPage = () => {
                 </>
             )}
             <AddToItineraryModal
-                show={showModal}
-                onClose={() => setShowModal(false)}
+                show={showAddModal}
+                onClose={() => setShowAddModal(false)}
                 place={selectedPlace}
+            />
+            {/* Modal to display place details */}
+            <PlaceDetailsModal
+                show={showDetailsModal}
+                onClose={() => setShowDetailsModal(false)}
+                placeDetails={selectedPlaceDetails}
             />
             
             <Footer />
         </div>
-    ); 
-}; 
-export default ItineraryPage;
+    );
+};
 
+export default ItineraryPage;
 
 

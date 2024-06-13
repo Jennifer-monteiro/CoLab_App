@@ -33,10 +33,14 @@ def get_popular_destinations(city, categories):
         # Process each result and extract relevant details
         for place in results:
             place_name = place.get('name', 'Unnamed Place')
+            formatted_address = place.get('formatted_address', 'Address not available')
+
             photo_reference = place.get('photos', [])[0].get('photo_reference', '') if place.get('photos') else ''
             photo_url = f"https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference={photo_reference}&key={API_KEY}"
+            
             place_details = {
                 'name': place_name,
+                'address': formatted_address,
                 'photo_url': photo_url
             }
             popular_destinations.append(place_details)
@@ -139,50 +143,4 @@ def add_item_to_itinerary(itinerary_id):
     return jsonify({"message": "Item added successfully", "item": new_item.to_json()}), 201
 
 
-
-@itinerary_bp.route('/filter-places', methods=['POST'])
-def filter_places():
-    city = request.json.get('city')
-    categories = request.json.get('categories')
-
-    if not city:
-        return jsonify({'error': 'City not provided'}), 400
-
-    if not categories:
-        return jsonify({'error': 'Categories not provided'}), 400
-
-    # Define a list to store filtered places
-    filtered_places = []
-
-    # Iterate over each selected filter category
-    for category in categories:
-        # Construct the query parameters for the Google Places API request
-        params = {
-            'query': f'{category} in {city}',
-            'key': API_KEY
-        }
-
-        # Send a request to the Google Places API
-        response = requests.get('https://maps.googleapis.com/maps/api/place/textsearch/json', params=params)
-
-        # Check if the request was successful
-        if response.status_code == 200:
-            # Extract the places from the response
-            results = response.json().get('results', [])
-
-            # Iterate over each place and extract relevant information
-            for place in results:
-                place_name = place.get('name', 'Unnamed Place')
-                photo_reference = place.get('photos', [])[0].get('photo_reference', '') if place.get('photos') else ''
-                photo_url = f"https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference={photo_reference}&key={API_KEY}"
-                place_details = {
-                    'name': place_name,
-                    'photo_url': photo_url
-                }
-                filtered_places.append(place_details)
-    
-    if not filtered_places:
-        return jsonify({'message': 'No places found for the given filters and city'}), 404
-
-    return jsonify({'filtered_places': filtered_places}), 200
 

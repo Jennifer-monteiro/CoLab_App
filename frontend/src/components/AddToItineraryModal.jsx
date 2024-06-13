@@ -47,20 +47,26 @@ const AddToItineraryModal = ({ show, onClose, place }) => {
         const selectedPlacePhoto = localStorage.getItem('selectedPlacePhoto');
         const userId = localStorage.getItem('userId');
         const itineraryId = itinerary.id;
-    
+
         try {
-          await axiosInstance.post(`/itineraries/${itineraryId}/items`, {
-            name: selectedPlaceName,
-            photo_url: selectedPlacePhoto,
-            user_id: userId,
-          });
-          setShowModal(false);
-          setMessage(MessageTypes.PLACE_ADDED_SUCCESSFULLY); // Set success message
+            await axiosInstance.post(`/itineraries/${itineraryId}/items`, {
+                name: selectedPlaceName,
+                photo_url: selectedPlacePhoto,
+                user_id: userId,
+            });
+            setShowModal(false);
+            setMessage(MessageTypes.PLACE_ADDED_SUCCESSFULLY); // Set success message
+            setTimeout(() => {
+                setMessage('');
+            }, 3000); // Hide message after 3 seconds
         } catch (error) {
-          console.error('Error adding place to itinerary:', error);
-          setMessage('Error adding place to itinerary.');
+            console.error('Error adding place to itinerary:', error);
+            setMessage('Error adding place to itinerary.');
+            setTimeout(() => {
+                setMessage('');
+            }, 3000); // Hide message after 3 seconds
         }
-      };
+    };
 
     const handleOpenCreateModal = () => {
         setShowModal(false);
@@ -102,13 +108,11 @@ const AddToItineraryModal = ({ show, onClose, place }) => {
                                     {itineraries.map((itinerary) => (
                                         <div
                                             key={itinerary.id}
-                                            className={selectedItinerary && selectedItinerary.id === itinerary.id ? 'add-to-itinerary-modal-selected' : ''}
+                                            className={`itinerary-item ${selectedItinerary && selectedItinerary.id === itinerary.id ? 'add-to-itinerary-modal-selected' : ''}`}
                                             onClick={() => handleSelectItinerary(itinerary)}
                                         >
-                                            <div className="itinerary-item">
-                                                <img src={getRandomPhoto(itinerary)} alt={itinerary.name} />
-                                                <span>{itinerary.name}</span>
-                                            </div>
+                                            <img src={getRandomPhoto(itinerary)} alt={itinerary.name} />
+                                            <span>{itinerary.name}</span>
                                         </div>
                                     ))}
                                 </div>

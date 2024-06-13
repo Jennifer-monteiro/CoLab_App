@@ -10,12 +10,14 @@
 .filter-chip {
   display: flex;
   align-items: center;
-  background-color: #ddd;
-  border-radius: 15px;
+  background-color: #FFF;
+  border: 1px solid black;
+  border-radius: 20px;
   padding: 5px 10px;
   font-size: 14px;
   margin-right: 5px;
   margin-bottom: 5px; /* Add margin-bottom for wrapping layout */
+  font-weight: bold;
 }
 
 /* Remove filter button */
@@ -24,8 +26,11 @@
   border: none;
   margin-left: 5px;
   cursor: pointer;
-  color: red;
+  color:black;
   font-weight: bold;
+  padding: 5px;
+  font-size: 16px; /* Increase font size for the 'x' icon */
+  line-height: 1; /* Ensure the 'x' icon is properly centered */
 }
 
 /* Existing styles */

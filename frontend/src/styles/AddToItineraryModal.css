@@ -12,23 +12,32 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    transition: all 0.3s ease-in-out;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
 }
 
 .add-to-itinerary-modal .itinerary-list {
     display: grid;
     grid-template-columns: repeat(2, 1fr); /* Two columns with equal width */
-    
 }
 
 .add-to-itinerary-modal .itinerary-item {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 5px;
+    padding: 7px;
     border: none;
     border-radius: 5px;
     text-align: left; /* Align the text to the left */
+    cursor: pointer; /* Change cursor to pointer on hover */
+    transition: transform 0.2s, box-shadow 0.2s;
+}
 
+.add-to-itinerary-modal .itinerary-item:hover {
+    transform: scale(1.05); /* Slightly enlarge the item on hover */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add a subtle shadow effect */
 }
 
 .add-to-itinerary-modal .itinerary-item img {
@@ -42,7 +51,6 @@
     text-align: left; /* Align the text to the left */
 }
 
-
 .add-to-itinerary-modal-content {
     background-color: white;
     padding: 20px;
@@ -53,6 +61,7 @@
     overflow: auto; /* Enable scrolling if content exceeds modal size */
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     position: relative; /* Ensure positioning context for the close button */
+    z-index: 10;
 }
 
 .add-to-itinerary-modal-close,
@@ -70,7 +79,6 @@
 .create-itinerary-modal h2 {
     margin-top: 0;
     text-align: center;
-
 }
 
 .add-to-itinerary-modal .divider {
@@ -79,9 +87,7 @@
     background-color: #ECBB40;
     margin: 20px 0; /* Adjust margin as needed */
     height: 3px;
-    
 }
-
 
 .add-to-itinerary-modal h3,
 .create-itinerary-modal h3 {
@@ -117,17 +123,12 @@
     font-size: 16px;
     font-weight: bold;
     width: 400px;
-    
 }
-
-
-
 
 .add-to-itinerary-modal button:hover,
 .create-itinerary-modal button:hover {
     background-color: #0056b3;
 }
-
 
 .add-to-itinerary-modal input[type="text"],
 .create-itinerary-modal input[type="text"] {
@@ -143,17 +144,12 @@
     color: green;
 }
 
-
-
-
-
 .create-itinerary-modal .divider {
     width: 100%;
     height: 2px;
     background-color: #ECBB40; /* Yellow color */
     margin: 20px 0; /* Adjust margin as needed */
 }
-
 
 .create-itinerary-modal h2 {
     margin-top: 0;
@@ -171,7 +167,6 @@
     overflow: auto; /* Enable scrolling if content exceeds modal size */
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     position: relative; /* Ensure positioning context for the close button */
-    
 }
 
 .create-itinerary-modal .input-container {
@@ -203,5 +198,13 @@
     margin-left: auto; /* Align button to the right */
 }
 
-
 /* AddToItineraryModal.css */
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
